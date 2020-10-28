@@ -23,18 +23,63 @@ app.post("/repositories", (request, response) => {
     techs,
     likes: 0,
   }
-  
+
   repositories.push(repository);
 
   return response.json(repository);
 });
 
 app.put("/repositories/:id", (request, response) => {
-  // TODO
+  const { id } = request.params;
+  let { title, url, techs } = request.body;
+
+  const repositoryIndex = repositories.findIndex(repository => repository.id === id )
+
+  if(repositoryIndex < 0){
+    return response.status(400).json({
+      error: 'Não foi possível encontrar o registro.'
+    });
+  }
+  if(!title){
+    title = repositories[repositoryIndex].title;
+  }
+  if(!techs){
+    techs=repositories[repositoryIndex].techs;
+  }
+  if(!url){
+    url=repositories[repositoryIndex].url;
+  }
+    likes=repositories[repositoryIndex].likes;
+  
+  //verifica dados se o dado passado for nulo ele adiciona o mesmo que ja esta cadastrado no repository
+  //senão usa o do que foi passado pra atualizar
+  const repository = {
+    id ,
+    title ,
+    url,
+    techs,
+    likes,
+  };
+
+  repositories[repositoryIndex] = repository;
+
+  return response.json(repository);
 });
 
 app.delete("/repositories/:id", (request, response) => {
-  // TODO
+  const { id } = request.params;
+
+  const repositoryIndex = repositories.findIndex(repository => repository.id === id )
+
+  if(repositoryIndex < 0){
+    return response.status(400).json({
+      error: 'Não foi possível encontrar o registro.'
+    });
+  }
+
+  repositories.splice(repositoryIndex, 1)
+
+  return response.status(204).send();
 });
 
 app.post("/repositories/:id/like", (request, response) => {
